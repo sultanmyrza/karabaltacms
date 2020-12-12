@@ -27,7 +27,7 @@ SECRET_KEY = 'b1w=-m#lemdd&5*+f*2*44fdvyoa&2&8m==8uqn6y(ow0p*el-'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['sultanmyrza.myjino.ru']
+ALLOWED_HOSTS = ['sultanmyrza.myjino.ru', 'localhost']
 
 
 # Application definition
@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # my apps
-    'karabaltacms'
+    'karabaltacms',
     'core',
 ]
 

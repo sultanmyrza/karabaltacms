@@ -1,50 +1,65 @@
 from django.db import models
 from datetime import date
 from django.utils.html import mark_safe
-# Create your models here.
+from django.utils.text import slugify
 
 
 class City(models.Model):
     """Model definition for City."""
-    display_name = models.CharField(max_length=150)
-    slug = models.CharField(max_length=150)
+    name = models.CharField(max_length=150, default="")
+    slug = models.CharField(max_length=150, blank=True)
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name, allow_unicode=True)
+        super().save(*args, **kwargs)
 
     class Meta:
         """Meta definition for City."""
 
         verbose_name = 'City'
-        verbose_name_plural = 'Citys'
+        verbose_name_plural = 'Cities'
 
     def __str__(self):
         """Unicode representation of City."""
-        return self.display_name
+        return self.name
 
 
 class Category(models.Model):
     """Model definition for Category."""
 
-    title = models.CharField(max_length=50)
+    name = models.CharField(max_length=150, default="")
+    slug = models.CharField(max_length=150, blank=True, null=True)
+    icon = models.ImageField(upload_to='icons', default="")
 
     class Meta:
         """Meta definition for Category."""
 
         verbose_name = 'Category'
-        verbose_name_plural = 'Categorys'
+        verbose_name_plural = 'Categories'
 
     def __str__(self):
         """Unicode representation of Category."""
-        return self.title
+        return self.name
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name, allow_unicode=True)
+        super().save(*args, **kwargs)
+
+    def image_preview(self):
+        if self.icon:
+            return mark_safe('<img src="{0}" width="50" height="50" />'.format(self.icon.url))
+        else:
+            return '(No image)'
 
 
 class Ad(models.Model):
     """Model definition for Ad."""
 
-    title = models.CharField(max_length=120)
     description = models.TextField(max_length=300)
     phone_number = models.CharField(max_length=50)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     regions = models.ManyToManyField(City)
-    timestamp = models.DateTimeField(default='')
+    timestamp = models.DateTimeField(auto_now=True)
     expire_date = models.DateField(default='')
 
     @property
@@ -59,7 +74,7 @@ class Ad(models.Model):
 
     def __str__(self):
         """Unicode representation of Ad."""
-        return self.title
+        return self.description
 
 
 class AdVideo(models.Model):
@@ -83,7 +98,7 @@ class AdVideo(models.Model):
 
     def __str__(self):
         """Unicode representation of AdVideo."""
-        return self.ad.title
+        return self.ad.description
 
     def thumbnail_preview(self):
         if self.thumbnailUrl:
@@ -106,7 +121,7 @@ class AdImage(models.Model):
 
     def __str__(self):
         """Unicode representation of AdImage."""
-        return self.ad.title
+        return self.ad.description
 
     def image_preview(self):
         if self.image:

@@ -8,11 +8,15 @@ admin.site.unregister(User)
 
 
 class CityAdmin(admin.ModelAdmin):
-    list_display = ['display_name', 'slug']
+    list_display = ['name', 'slug']
+    exclude = ['slug']
 
 
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ['title']
+    list_display = ['name', 'slug', 'image_preview']
+    readonly_fields = ['image_preview']
+
+    exclude = ['slug']
 
 
 class RegionInline(admin.TabularInline):
@@ -33,8 +37,8 @@ class AdVideoInline(admin.TabularInline):
 
 
 class AdAdmin(admin.ModelAdmin):
-    list_display = ['title', 'phone_number',
-                    'description',  'category', 'expire_date', 'days_left', ]
+    list_display = ['description', 'phone_number',
+                    'category', 'expire_date', 'days_left', ]
     list_filter = ['category', 'regions']
     inlines = [
         RegionInline,
