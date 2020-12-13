@@ -29,7 +29,7 @@ class Category(models.Model):
 
     name = models.CharField(max_length=150, default="")
     slug = models.CharField(max_length=150, blank=True, null=True)
-    icon = models.ImageField(upload_to='icons', default="")
+    icon = models.FileField(upload_to='icons', default="")
 
     class Meta:
         """Meta definition for Category."""
