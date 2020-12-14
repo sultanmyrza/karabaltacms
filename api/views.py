@@ -1,7 +1,13 @@
 from django.core.paginator import Paginator
+from django.db.models.fields.files import FileField
 from core.models import AdImage, AdVideo, Category, City, Ad
 from django.shortcuts import render
 from django.http import JsonResponse
+import json
+import requests
+import os.path
+from os import path
+from django.core.files import File
 
 
 class ApiV1:
@@ -27,33 +33,30 @@ class ApiV1:
             categoriesData.append({
                 'id': category.id,
                 'name': category.name,
+                'iconUrl': category.icon.url,
             })
 
         data = {"result": "success", "data": categoriesData}
         return JsonResponse(data, safe=False)
 
     def getAds(request):
-        adsCity = request.GET.get('city', 'Все')
-        print(adsCity)
+        adsCity = request.GET.get('city', None)
+        adsCategory = request.GET.get('category', 'Все')
+        pageNumber = request.GET.get('page', 0)
+        ITEMS_PER_PAGE = 10
 
-        adsCategory = request.GET.get('catgory', 'Все')
-        pageNumber = request.GET.get('page', 1)
+        ads = Ad.objects.all().order_by('-timestamp')
 
-        # ads = Ad.objects.all()
-        # .filter(
-        #     regions__display_name=adsRegion
-        # ).filter(
-        #     category__title=adsCategory
-        # )
+        if adsCity:
+            ads = ads.filter(category__name__contains=adsCity)
+        if adsCategory != 'Все':
+            ads = Ad.objects.all().filter(category__name__contains=adsCategory)
 
-        # TODO: add filter
-        ads = Ad.objects.all().filter(category__name__contains=adsCity)
-
-        paginator = Paginator(ads, 1)  # Show 25 contacts per page.
-        page_number = request.GET.get('page', 1)
+        # Show 25 contacts per page.
+        paginator = Paginator(ads, ITEMS_PER_PAGE)
 
         # get_page seems more safe
-        pageAds = paginator.get_page(page_number)
+        pageAds = paginator.get_page(pageNumber)
 
         # pageAds = paginator.page(page_number)
 
@@ -64,11 +67,11 @@ class ApiV1:
                 ad__id=ad.id
             )
             adImagesData = []
-            for adVideo in adImages:
+            for adImage in adImages:
                 adImagesData.append({
                     "type": "image",
-                    "position": adVideo.position,
-                    "imageUrl": adVideo.image.url,
+                    "position": adImage.position,
+                    "imageUrl": adImage.image.url,
                 })
 
             adVideos = AdVideo.objects.filter(
@@ -84,9 +87,13 @@ class ApiV1:
                 })
 
             adsData.append({
+                'categoryName': ad.category.name,
                 'description': ad.description,
                 'phoneNumber': ad.phone_number,
+                'isWhatsAppNumber': ad.is_whatsapp_number,
                 'category': ad.category.name,
+                'timestamp': ad.timestamp,
+                'expireDate': ad.expire_date,
                 'content': [*adImagesData, *adVideosData]
             })
 
@@ -105,6 +112,144 @@ class ApiV1:
     def getSponsoredAds(request):
         data = [{"result": "TODO: return sponsored ads"}]
         return JsonResponse(data, safe=False)
+
+    def prepopulateFromJson(request):
+        canPrepopulateFromJson = True
+
+        defaultCity, defaultCityCreated = City.objects.get_or_create(
+            name="Кара-Балта")
+
+        if canPrepopulateFromJson:
+            with open('karabalta_data.json') as json_file:
+                data = json.load(json_file)['data']
+
+                for idx, categoryData in enumerate(data):
+                    categoryName = categoryData['name']
+
+                    category, categoryCreated = Category.objects.get_or_create(
+                        name=categoryName)
+
+                    for adData in categoryData['ads']:
+                        ad, adCreated = Ad.objects.get_or_create(
+                            description=adData['title'],
+                            phone_number=adData['number'],
+                            category=category,
+                            expire_date=adData['date'].split(' ')[0],
+                        )
+
+                        if adCreated:
+                            ad.regions.add(defaultCity)
+                            ad.save()
+
+                        # TODO: add images
+
+                return JsonResponse({
+                    'success': True,
+                }, safe=True)
+
+            # TODO: return response
+            pass
+        else:
+            # TODO: return response (can do only in development mode)
+            pass
+
+    def prepopulateMedia(request):
+        canPrepopulateMedia = True
+
+        defaultCity, defaultCityCreated = City.objects.get_or_create(
+            name="Кара-Балта")
+
+        if canPrepopulateMedia:
+            with open('karabalta_data.json') as json_file:
+                data = json.load(json_file)['data']
+
+                for idx, categoryData in enumerate(data):
+                    if idx == 0:
+                        continue
+
+                    categoryName = categoryData['name']
+
+                    category, categoryCreated = Category.objects.get_or_create(
+                        name=categoryName)
+                    iconUrl = categoryData['icon']
+                    fileName = categoryName + '_' + \
+                        iconUrl.split('/')[-1] + '.svg'
+                    filePath = 'tmp/media/icons/' + fileName
+
+                    # TODO: add category images
+                    if not category.icon.name or not path.exists(filePath):
+                        # TODO: download category image
+
+                        r = requests.get(iconUrl)
+                        open(filePath, 'wb').write(r.content)
+
+                        category.icon.save(
+                            fileName, File(open(filePath, 'rb')))
+
+                    adsData = categoryData['ads']
+                    for adData in adsData:
+                        ad, adCreated = Ad.objects.get_or_create(
+                            description=adData['title'],
+                            phone_number=adData['number'],
+                            category=category,
+                            expire_date=adData['date'].split(' ')[0],
+                        )
+
+                        if adCreated:
+                            ad.regions.add(defaultCity)
+                            ad.save()
+
+                        # if image not exists in file system
+
+                        imagesTagLen = len(adData['images_tag'])
+                        imagesTagPlacholder = []
+                        if imagesTagLen == 1:
+                            imageTag = [
+                                'https://images.unsplash.com/photo-1606788076220-dc07ae3d2120?ixid=MXwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80']
+                        elif imagesTagLen == 2:
+                            imagesTagPlacholder = [
+                                'https://images.unsplash.com/photo-1606788076220-dc07ae3d2120?ixid=MXwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80',
+                                'https://images.unsplash.com/photo-1606815217947-2b9dac4aec89?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
+                            ]
+                        else:
+                            imagesTagPlacholder = [
+                                'https://images.unsplash.com/photo-1606788076220-dc07ae3d2120?ixid=MXwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80',
+                                'https://images.unsplash.com/photo-1606815217947-2b9dac4aec89?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
+                                'https://images.unsplash.com/photo-1606942790567-5783bab8d944?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw2fHx8ZW58MHx8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
+                            ]
+
+                        if len(adData['images_tag']) > 0:
+                            for position, imageTag in enumerate(adData['images_tag']):
+
+                                imageUrl = imageTag
+                                # imageUrl = imagesTagPlacholder[position]
+
+                                r = requests.get(
+                                    imageUrl, allow_redirects=True)
+                                contentType = r.headers['Content-Type']
+                                imageFormat = contentType.split('/')[-1]
+
+                                fileName = categoryName + '_' + \
+                                    imageTag.split('/')[-1] + '.' + imageFormat
+
+                                filePath = 'tmp/media/images/' + fileName
+
+                                if not path.exists(filePath):
+
+                                    open(filePath, 'wb').write(r.content)
+                                    adImage = AdImage(position=position, ad=ad)
+                                    adImage.image.save(
+                                        fileName, File(open(filePath, 'rb')))
+
+                return JsonResponse({
+                    'success': True,
+                }, safe=True)
+
+            # TODO: return response
+            pass
+        else:
+            # TODO: return response (can do only in development mode)
+            pass
 
 
 def listing(request):

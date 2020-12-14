@@ -37,8 +37,8 @@ class AdVideoInline(admin.TabularInline):
 
 
 class AdAdmin(admin.ModelAdmin):
-    list_display = ['description', 'phone_number',
-                    'category', 'expire_date', 'days_left', ]
+    list_display = ['description', 'phone_number', 'is_whatsapp_number',
+                    'category', 'timestamp', 'expire_date', 'days_left', ]
     list_filter = ['category', 'regions']
     inlines = [
         RegionInline,
@@ -59,7 +59,12 @@ class SponsorAdmin(admin.ModelAdmin):
     exclude = ['regions']
 
 
+class AdImageAdmin(admin.ModelAdmin):
+    list_per_page = 500
+
+
 admin.site.register(City, CityAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Ad, AdAdmin)
 admin.site.register(SponsorContent, SponsorAdmin)
+admin.site.register(AdImage, AdImageAdmin)

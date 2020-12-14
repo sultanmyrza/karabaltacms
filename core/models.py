@@ -57,6 +57,7 @@ class Ad(models.Model):
 
     description = models.TextField(max_length=300)
     phone_number = models.CharField(max_length=50)
+    is_whatsapp_number = models.BooleanField(default=False)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     regions = models.ManyToManyField(City)
     timestamp = models.DateTimeField(auto_now=True)

@@ -1,0 +1,143 @@
+[
+  {
+    "model": "core.city",
+    "pk": 1,
+    "fields": { "name": "Кара-Балта", "slug": "кара-балта" }
+  },
+  {
+    "model": "core.city",
+    "pk": 2,
+    "fields": { "name": "Бишкек", "slug": "бишкек" }
+  },
+  {
+    "model": "core.city",
+    "pk": 3,
+    "fields": { "name": "Кант", "slug": "кант" }
+  },
+  {
+    "model": "core.category",
+    "pk": 1,
+    "fields": { "name": "Все", "slug": "все", "icon": "icons/all.svg" }
+  },
+  {
+    "model": "core.category",
+    "pk": 2,
+    "fields": {
+      "name": "Недвижимость",
+      "slug": "недвижимость",
+      "icon": "icons/dom.svg"
+    }
+  },
+  {
+    "model": "core.category",
+    "pk": 3,
+    "fields": {
+      "name": "Транспорт",
+      "slug": "транспорт",
+      "icon": "icons/avto.svg"
+    }
+  },
+  {
+    "model": "core.ad",
+    "pk": 1,
+    "fields": {
+      "description": "Продаю пол дома, 3 комнаты+ веранда,прихожая, кухня,с/у в доме,гор/хол.вода, общ.пл.70кв.м. Общ.пл. участка 3,5 сотки. Ул.стадионная , возле 4 школы. 23000$,",
+      "phone_number": "996558844770",
+      "category": 2,
+      "timestamp": "2020-12-12T12:14:03.509Z",
+      "expire_date": "2020-12-31",
+      "regions": [1]
+    }
+  },
+  {
+    "model": "core.ad",
+    "pk": 2,
+    "fields": {
+      "description": "Отделка квартир домов под ключ.установка счётчиков на горячую воду.утепление болконов а также замена сантехники,электрики,установка стиральных машин",
+      "phone_number": "+996559991260",
+      "category": 2,
+      "timestamp": "2020-12-13T06:19:47.691Z",
+      "expire_date": "2020-12-16",
+      "regions": [1]
+    }
+  },
+  {
+    "model": "core.ad",
+    "pk": 3,
+    "fields": {
+      "description": "Продаётся дача за 15000$ в кооперативе Тюлпан с.Сосновка. участок 32сот, на  участки находится дом, баня, навес, пруд,яблони, малина, орех большой. Есть вариант рассрочки.",
+      "phone_number": "996707157147",
+      "category": 2,
+      "timestamp": "2020-12-13T06:37:19.878Z",
+      "expire_date": "2020-12-05",
+      "regions": [1]
+    }
+  },
+  {
+    "model": "core.ad",
+    "pk": 4,
+    "fields": {
+      "description": "Ауди 100 год86 об 1.8 корбератор",
+      "phone_number": "996 755 210 889",
+      "category": 3,
+      "timestamp": "2020-12-13T06:39:50.966Z",
+      "expire_date": "2020-12-16",
+      "regions": [1]
+    }
+  },
+  {
+    "model": "core.advideo",
+    "pk": 1,
+    "fields": {
+      "ad": 1,
+      "position": 1,
+      "videoUrl": "https://youtu.be/0a8epLkppYk",
+      "thumbnailUrl": "https://img.youtube.com/vi/0a8epLkppYk/hqdefault.jpg"
+    }
+  },
+  {
+    "model": "core.adimage",
+    "pk": 1,
+    "fields": {
+      "ad": 1,
+      "position": 0,
+      "image": "images/Screen_Shot_2020-12-11_at_9.50.17_PM.png"
+    }
+  },
+  {
+    "model": "core.adimage",
+    "pk": 2,
+    "fields": {
+      "ad": 2,
+      "position": 0,
+      "image": "images/9da8d3c3-48bf-4703-b99a-6fb9ddf583b1.jpg"
+    }
+  },
+  {
+    "model": "core.adimage",
+    "pk": 3,
+    "fields": {
+      "ad": 2,
+      "position": 1,
+      "image": "images/ef464883-fd7c-423c-959e-34dabdc6e00f.jpg"
+    }
+  },
+  {
+    "model": "core.adimage",
+    "pk": 4,
+    "fields": {
+      "ad": 4,
+      "position": 0,
+      "image": "images/d0f5760b-026f-4589-b2be-aa45e7eaca5c.jpg"
+    }
+  },
+  {
+    "model": "core.adimage",
+    "pk": 5,
+    "fields": {
+      "ad": 4,
+      "position": 1,
+      "image": "images/56cbdc6f-9968-4f05-b7ea-2248b4e27cc0.jpg"
+    }
+  }
+]
