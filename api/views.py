@@ -42,27 +42,28 @@ class ApiV1:
     def getAds(request):
         adsCity = request.GET.get('city', None)
         adsCategory = request.GET.get('category', 'Все')
-        pageNumber = request.GET.get('page', 0)
-        ITEMS_PER_PAGE = 10
+        pageNumber = int(request.GET.get('page', 0))
+        itemsPerPage = 10
 
-        ads = Ad.objects.all().order_by('-timestamp')
+        ads = []
 
-        if adsCity:
-            ads = ads.filter(category__name__contains=adsCity)
         if adsCategory != 'Все':
-            ads = ads.filter(category__name__contains=adsCategory)
+            ads = Ad.objects.all().order_by(
+                '-timestamp').filter(category__name__contains=adsCategory)
+        else:
+            ads = Ad.objects.all().order_by('-timestamp')
 
-        # Show 25 contacts per page.
-        paginator = Paginator(ads, ITEMS_PER_PAGE)
+        totalItems = ads.count()
+        totalPages = totalItems // itemsPerPage
 
-        # get_page seems more safe
-        pageAds = paginator.get_page(pageNumber)
+        startIndex = pageNumber * itemsPerPage
+        endIndex = min(startIndex + itemsPerPage, totalItems)
 
-        # pageAds = paginator.page(page_number)
+        ads = ads[startIndex:endIndex]
 
         adsData = []
 
-        for ad in pageAds:
+        for ad in ads:
             adImages = AdImage.objects.filter(
                 ad__id=ad.id
             )
@@ -103,11 +104,11 @@ class ApiV1:
             "adsCategory": adsCategory,
             "pageNumber": pageNumber,
             "minPage": 1,
-            "maxPage": paginator.num_pages,
-            "totalItems": paginator.count,
+            "maxPage": totalPages,
+            "totalItems": totalItems,
             "data": adsData,
         }
-        return JsonResponse(data, safe=False)
+        return JsonResponse(data, safe=True)
 
     def getSponsoredAds(request):
         data = [{"result": "TODO: return sponsored ads"}]
