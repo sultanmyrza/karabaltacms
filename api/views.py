@@ -50,7 +50,7 @@ class ApiV1:
         if adsCity:
             ads = ads.filter(category__name__contains=adsCity)
         if adsCategory != 'Все':
-            ads = Ad.objects.all().filter(category__name__contains=adsCategory)
+            ads = ads.filter(category__name__contains=adsCategory)
 
         # Show 25 contacts per page.
         paginator = Paginator(ads, ITEMS_PER_PAGE)
