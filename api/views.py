@@ -186,10 +186,8 @@ class ApiV1:
                     fileName = categoryName + '_' + \
                         iconUrl.split('/')[-1] + '.svg'
 
-                    currentDir = Path(__file__).resolve()
-
                     filePath = os.path.join(
-                        currentDir, 'tmp/media/icons/' + fileName)
+                        BASE_DIR, 'tmp/media/icons/' + fileName)
 
                     # TODO: add category images
                     if not category.icon.name or not path.exists(filePath):
@@ -229,7 +227,7 @@ class ApiV1:
                                     imageTag.split('/')[-1] + '.' + imageFormat
 
                                 filePath = os.path.join(
-                                    currentDir, 'tmp/media/images/' + fileName)
+                                    BASE_DIR, 'tmp/media/images/' + fileName)
 
                                 if not path.exists(filePath):
 
