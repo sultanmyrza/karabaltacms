@@ -165,7 +165,12 @@ class ApiV1:
             name="Кара-Балта")
 
         if canPrepopulateMedia:
-            with open('karabalta_data.json') as json_file:
+            import os
+            from pathlib import Path
+            BASE_DIR = Path(__file__).resolve().parent.parent
+
+            fixture_file_path = os.path.join(BASE_DIR, 'karabalta_data.json')
+            with open(fixture_file_path) as json_file:
                 data = json.load(json_file)['data']
 
                 for idx, categoryData in enumerate(data):
@@ -177,9 +182,14 @@ class ApiV1:
                     category, categoryCreated = Category.objects.get_or_create(
                         name=categoryName)
                     iconUrl = categoryData['icon']
+
                     fileName = categoryName + '_' + \
                         iconUrl.split('/')[-1] + '.svg'
-                    filePath = 'tmp/media/icons/' + fileName
+
+                    currentDir = Path(__file__).resolve()
+
+                    filePath = os.path.join(
+                        currentDir, 'tmp/media/icons/' + fileName)
 
                     # TODO: add category images
                     if not category.icon.name or not path.exists(filePath):
@@ -204,25 +214,6 @@ class ApiV1:
                             ad.regions.add(defaultCity)
                             ad.save()
 
-                        # if image not exists in file system
-
-                        imagesTagLen = len(adData['images_tag'])
-                        imagesTagPlacholder = []
-                        if imagesTagLen == 1:
-                            imageTag = [
-                                'https://images.unsplash.com/photo-1606788076220-dc07ae3d2120?ixid=MXwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80']
-                        elif imagesTagLen == 2:
-                            imagesTagPlacholder = [
-                                'https://images.unsplash.com/photo-1606788076220-dc07ae3d2120?ixid=MXwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80',
-                                'https://images.unsplash.com/photo-1606815217947-2b9dac4aec89?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
-                            ]
-                        else:
-                            imagesTagPlacholder = [
-                                'https://images.unsplash.com/photo-1606788076220-dc07ae3d2120?ixid=MXwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80',
-                                'https://images.unsplash.com/photo-1606815217947-2b9dac4aec89?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
-                                'https://images.unsplash.com/photo-1606942790567-5783bab8d944?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw2fHx8ZW58MHx8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
-                            ]
-
                         if len(adData['images_tag']) > 0:
                             for position, imageTag in enumerate(adData['images_tag']):
 
@@ -237,7 +228,8 @@ class ApiV1:
                                 fileName = categoryName + '_' + \
                                     imageTag.split('/')[-1] + '.' + imageFormat
 
-                                filePath = 'tmp/media/images/' + fileName
+                                filePath = os.path.join(
+                                    currentDir, 'tmp/media/images/' + fileName)
 
                                 if not path.exists(filePath):
 
