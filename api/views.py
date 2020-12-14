@@ -120,7 +120,12 @@ class ApiV1:
             name="Кара-Балта")
 
         if canPrepopulateFromJson:
-            with open('karabalta_data.json') as json_file:
+            import os
+            from pathlib import Path
+            BASE_DIR = Path(__file__).resolve().parent.parent
+
+            fixture_file_path = os.path.join(BASE_DIR, 'karabalta_data.json')
+            with open(fixture_file_path) as json_file:
                 data = json.load(json_file)['data']
 
                 for idx, categoryData in enumerate(data):
