@@ -22,18 +22,24 @@ class CategoryAdmin(admin.ModelAdmin):
 class RegionInline(admin.TabularInline):
     model = Ad.regions.through
     extra = 0
+    verbose_name = "Регион"
+    verbose_name_plural = "Регионы (В каких регионах показывать?)"
 
 
 class AdImageInline(admin.TabularInline):
     model = AdImage
     extra = 0
     readonly_fields = ('image_preview',)
+    verbose_name = "Картинки"
+    verbose_name_plural = "Картинки"
 
 
 class AdVideoInline(admin.TabularInline):
     model = AdVideo
     extra = 0
     readonly_fields = ['thumbnailUrl', 'thumbnail_preview']
+    verbose_name = "Видео"
+    verbose_name_plural = "Видео (Вставить ссылку с YouTube!)"
 
 
 class AdAdmin(admin.ModelAdmin):
@@ -46,6 +52,8 @@ class AdAdmin(admin.ModelAdmin):
         AdVideoInline,
     ]
     exclude = ['regions']
+    verbose_name = "Объявление"
+    verbose_name_plural = "Объявления"
 
 
 class SponsorAdmin(admin.ModelAdmin):

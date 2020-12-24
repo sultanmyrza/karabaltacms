@@ -40,20 +40,21 @@ class ApiV1:
         return JsonResponse(data, safe=False)
 
     def getAds(request):
+        isShare = request.GET.get('isShare', False) == 'True'
         adsCity = request.GET.get('city', None)
         adsCategory = request.GET.get('category', 'Все')
         pageNumber = int(request.GET.get('page', 0))
         itemsPerPage = 10
 
         ads = []
-
         if adsCategory != 'Все':
             ads = Ad.objects.all().order_by(
-                '-timestamp').filter(category__name__contains=adsCategory)
+                '-timestamp').filter(category__name__contains=adsCategory).filter(is_share=isShare)
         else:
-            ads = Ad.objects.all().order_by('-timestamp')
+            ads = Ad.objects.all().order_by('-timestamp').filter(is_share=isShare)
 
         totalItems = ads.count()
+        totalPages = max(totalItems // itemsPerPage, 1)
         totalPages = totalItems // itemsPerPage
 
         startIndex = pageNumber * itemsPerPage
@@ -88,6 +89,7 @@ class ApiV1:
                 })
 
             adsData.append({
+                'isShare': ad.is_share,
                 'categoryName': ad.category.name,
                 'description': ad.description,
                 'phoneNumber': ad.phone_number,

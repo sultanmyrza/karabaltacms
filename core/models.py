@@ -54,14 +54,17 @@ class Category(models.Model):
 
 class Ad(models.Model):
     """Model definition for Ad."""
-
-    description = models.TextField(max_length=300)
-    phone_number = models.CharField(max_length=50)
-    is_whatsapp_number = models.BooleanField(default=False)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    regions = models.ManyToManyField(City)
+    is_share = models.BooleanField(default=False, verbose_name="Акция")
+    description = models.TextField(max_length=300, verbose_name="Акция")
+    phone_number = models.CharField(
+        max_length=50, verbose_name="Номер телефона")
+    is_whatsapp_number = models.BooleanField(
+        default=False, verbose_name="Whatsapp номер")
+    category = models.ForeignKey(
+        Category, on_delete=models.CASCADE, verbose_name="Категории")
+    regions = models.ManyToManyField(City, verbose_name="Регион")
     timestamp = models.DateTimeField(auto_now=True)
-    expire_date = models.DateField(default='')
+    expire_date = models.DateField(default='', verbose_name="Активен до")
 
     @property
     def days_left(self):
