@@ -1,6 +1,6 @@
 from django.core.paginator import Paginator
 from django.db.models.fields.files import FileField
-from core.models import AdImage, AdVideo, Category, City, Ad, News, NewsImage, NewsVideo
+from core.models import AdImage, AdVideo, Category, City, Ad, News, NewsImage, NewsVideo, SponsorContent
 from django.shortcuts import render
 from django.http import JsonResponse
 import json
@@ -170,7 +170,26 @@ class ApiV1:
         return JsonResponse(data, safe=True)
 
     def getSponsoredAds(request):
-        data = [{"result": "TODO: return sponsored ads"}]
+        pageNumber = 0
+        itemsPerPage = 10
+        # TODO: only show sponsored content
+        sponsoredContents = SponsorContent.objects.all().order_by('-timestamp')
+
+        data = {
+            "result": "success",
+            'data': [],
+        }
+
+        for sponsoredContent in sponsoredContents:
+            sponsoredContentBannerImage = AdImage.objects.filter(
+                ad__id=sponsoredContent.id).first()
+            data['data'].append({
+                'description': sponsoredContent.description,
+                'sponsorName': sponsoredContent.sponsor_name,
+                'redirectUrl': sponsoredContent.redirect_url,
+                'bannerImage': sponsoredContentBannerImage.image.url,
+            })
+
         return JsonResponse(data, safe=False)
 
     def prepopulateFromJson(request):

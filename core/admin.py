@@ -99,7 +99,7 @@ class SponsorAdmin(admin.ModelAdmin):
         RegionInline,
         AdImageInline,
     ]
-    exclude = ['regions']
+    exclude = ['regions', 'is_share']
 
 
 class AdImageAdmin(admin.ModelAdmin):

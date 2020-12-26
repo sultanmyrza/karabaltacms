@@ -203,13 +203,14 @@ class AdImage(models.Model):
 class SponsorContent(Ad):
     """Model definition for SponsorContent."""
     sponsor_name = models.CharField(max_length=50)
+    redirect_url = models.CharField(max_length=1000, default="")
     # TODO: add image for banner url
 
     class Meta:
         """Meta definition for SponsorContent."""
 
-        verbose_name = 'SponsorContent'
-        verbose_name_plural = 'SponsorContents'
+        verbose_name = 'Спонсорский контент'
+        verbose_name_plural = 'Спонсорские контенты'
 
     def __str__(self):
         """Unicode representation of SponsorContent."""
