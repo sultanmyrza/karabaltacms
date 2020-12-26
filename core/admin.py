@@ -85,7 +85,7 @@ class NewsAdmin(admin.ModelAdmin):
 
 
 class InfoAdmin(admin.ModelAdmin):
-    list_display = ['description', 'phone_number', 'is_whatsapp_number',
+    list_display = ['title', 'description', 'phone_number', 'is_whatsapp_number',
                     'category', ]
     list_filter = ['category', ]
     verbose_name = "Объявление"

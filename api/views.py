@@ -1,7 +1,7 @@
 import datetime
 from django.core.paginator import Paginator
 from django.db.models.fields.files import FileField
-from core.models import AdImage, AdVideo, Category, City, Ad, InfoCategory, News, NewsImage, NewsVideo, SponsorContent
+from core.models import AdImage, AdVideo, Category, City, Ad, Info, InfoCategory, News, NewsImage, NewsVideo, SponsorContent
 from django.shortcuts import render
 from django.http import JsonResponse
 import json
@@ -50,6 +50,47 @@ class ApiV1:
             })
 
         data = {"result": "success", "data": categoriesData}
+        return JsonResponse(data, safe=False)
+
+    def getInfos(request):
+        infoCategory = request.GET.get('infoCategory', 'Все')
+        pageNumber = int(request.GET.get('page', 0))
+        itemsPerPage = 10
+
+        infos = []
+        infos = Info.objects.order_by('-timestamp')
+
+        if infoCategory != 'Все':
+            infos = infos.filter(category__name__contains=infoCategory)
+
+        totalItems = infos.count()
+        totalPages = max(totalItems // itemsPerPage, 1)
+        totalPages = totalItems // itemsPerPage
+
+        startIndex = pageNumber * itemsPerPage
+        endIndex = min(startIndex + itemsPerPage, totalItems)
+        infos = infos[startIndex:endIndex]
+
+        data = {
+            'result': 'success',
+            "infoCategory": infoCategory,
+            "pageNumber": pageNumber,
+            "minPage": 1,
+            "maxPage": totalPages,
+            "totalItems": totalItems,
+            'data': []
+        }
+
+        for info in infos:
+            data['data'].append({
+                'title': info.title,
+                'description': info.description,
+                'address': info.address,
+                'phoneNumber': info.phone_number,
+                'isWhatsAppNumber': info.is_whatsapp_number,
+                'category': info.category.name,
+            })
+
         return JsonResponse(data, safe=False)
 
     def getAds(request):

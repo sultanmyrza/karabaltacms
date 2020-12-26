@@ -124,11 +124,13 @@ class Ad(models.Model):
 
 class Info(models.Model):
     """Model definition for Ad."""
-    description = models.TextField(max_length=300, verbose_name="Описание")
+    title = models.CharField(max_length=150, default="", verbose_name="Title")
+    description = models.TextField(max_length=300, verbose_name="Sub title")
     phone_number = models.CharField(
         max_length=50, verbose_name="Номер телефона")
     is_whatsapp_number = models.BooleanField(
         default=False, verbose_name="Whatsapp номер")
+    address = models.CharField(max_length=350, default="")
     category = models.ForeignKey(
         InfoCategory, on_delete=models.CASCADE, verbose_name="Категории")
     timestamp = models.DateTimeField(auto_now=True)
