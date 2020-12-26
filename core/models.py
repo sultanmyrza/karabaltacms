@@ -16,8 +16,8 @@ class City(models.Model):
     class Meta:
         """Meta definition for City."""
 
-        verbose_name = 'City'
-        verbose_name_plural = 'Cities'
+        verbose_name = 'Регион'
+        verbose_name_plural = 'Регионы'
 
     def __str__(self):
         """Unicode representation of City."""
@@ -34,8 +34,36 @@ class Category(models.Model):
     class Meta:
         """Meta definition for Category."""
 
-        verbose_name = 'Category'
-        verbose_name_plural = 'Categories'
+        verbose_name = 'Реклама (категория)'
+        verbose_name_plural = 'Рекламы (категории)'
+
+    def __str__(self):
+        """Unicode representation of Category."""
+        return self.name
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name, allow_unicode=True)
+        super().save(*args, **kwargs)
+
+    def image_preview(self):
+        if self.icon:
+            return mark_safe('<img src="{0}" width="50" height="50" />'.format(self.icon.url))
+        else:
+            return '(No image)'
+
+
+class InfoCategory(models.Model):
+    """Model definition for InfoCategory."""
+
+    name = models.CharField(max_length=150, default="")
+    slug = models.CharField(max_length=150, blank=True, null=True)
+    icon = models.FileField(upload_to='icons', default="")
+
+    class Meta:
+        """Meta definition for Category."""
+
+        verbose_name = 'Информация (категория)'
+        verbose_name_plural = 'Информации (категории)'
 
     def __str__(self):
         """Unicode representation of Category."""
@@ -86,8 +114,30 @@ class Ad(models.Model):
     class Meta:
         """Meta definition for Ad."""
         ordering = ['category']
-        verbose_name = 'Ad'
-        verbose_name_plural = 'Ads'
+        verbose_name = 'Реклама'
+        verbose_name_plural = 'Рекламы'
+
+    def __str__(self):
+        """Unicode representation of Ad."""
+        return self.description
+
+
+class Info(models.Model):
+    """Model definition for Ad."""
+    description = models.TextField(max_length=300, verbose_name="Описание")
+    phone_number = models.CharField(
+        max_length=50, verbose_name="Номер телефона")
+    is_whatsapp_number = models.BooleanField(
+        default=False, verbose_name="Whatsapp номер")
+    category = models.ForeignKey(
+        InfoCategory, on_delete=models.CASCADE, verbose_name="Категории")
+    timestamp = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        """Meta definition for Ad."""
+        ordering = ['category']
+        verbose_name = 'Информация'
+        verbose_name_plural = 'Информации'
 
     def __str__(self):
         """Unicode representation of Ad."""

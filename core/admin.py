@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.admin.decorators import register
-from core.models import Ad, AdImage, AdVideo, Category, City, News, NewsImage, NewsVideo, SponsorContent
+from core.models import Ad, AdImage, AdVideo, Category, City, Info, InfoCategory, News, NewsImage, NewsVideo, SponsorContent
 from django.contrib.auth.models import Group, User
 
 admin.site.unregister(Group)
@@ -9,6 +9,13 @@ admin.site.unregister(User)
 
 class CityAdmin(admin.ModelAdmin):
     list_display = ['name', 'slug']
+    exclude = ['slug']
+
+
+class InfoCategoryAdmin(admin.ModelAdmin):
+    list_display = ['name', 'slug', 'image_preview']
+    readonly_fields = ['image_preview']
+
     exclude = ['slug']
 
 
@@ -77,6 +84,14 @@ class NewsAdmin(admin.ModelAdmin):
     ]
 
 
+class InfoAdmin(admin.ModelAdmin):
+    list_display = ['description', 'phone_number', 'is_whatsapp_number',
+                    'category', ]
+    list_filter = ['category', ]
+    verbose_name = "Объявление"
+    verbose_name_plural = "Объявления"
+
+
 class AdAdmin(admin.ModelAdmin):
     list_display = ['description', 'phone_number', 'is_whatsapp_number',
                     'category', 'timestamp', 'expire_date', 'days_left', ]
@@ -107,6 +122,8 @@ class AdImageAdmin(admin.ModelAdmin):
 
 
 admin.site.register(City, CityAdmin)
+admin.site.register(InfoCategory, InfoCategoryAdmin)
+admin.site.register(Info, InfoAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Ad, AdAdmin)
 admin.site.register(News, NewsAdmin)

@@ -1,7 +1,7 @@
 import datetime
 from django.core.paginator import Paginator
 from django.db.models.fields.files import FileField
-from core.models import AdImage, AdVideo, Category, City, Ad, News, NewsImage, NewsVideo, SponsorContent
+from core.models import AdImage, AdVideo, Category, City, Ad, InfoCategory, News, NewsImage, NewsVideo, SponsorContent
 from django.shortcuts import render
 from django.http import JsonResponse
 import json
@@ -31,6 +31,18 @@ class ApiV1:
 
         categoriesData = []
         for category in Category.objects.all():
+            categoriesData.append({
+                'id': category.id,
+                'name': category.name,
+                'iconUrl': category.icon.url,
+            })
+
+        data = {"result": "success", "data": categoriesData}
+        return JsonResponse(data, safe=False)
+
+    def getInfoCategories(request):
+        categoriesData = []
+        for category in InfoCategory.objects.all():
             categoriesData.append({
                 'id': category.id,
                 'name': category.name,
