@@ -1,3 +1,4 @@
+import datetime
 from django.core.paginator import Paginator
 from django.db.models.fields.files import FileField
 from core.models import AdImage, AdVideo, Category, City, Ad, News, NewsImage, NewsVideo, SponsorContent
@@ -47,11 +48,15 @@ class ApiV1:
         itemsPerPage = 10
 
         ads = []
+        today = datetime.date.today()
+        ads = Ad.objects.order_by('-expire_date')
+        ads = ads.filter(expire_date__gte=today)
+
         if adsCategory != 'Все':
-            ads = Ad.objects.all().order_by(
-                '-timestamp').filter(category__name__contains=adsCategory).filter(is_share=isShare)
+            ads = ads.filter(category__name__contains=adsCategory).filter(
+                is_share=isShare)
         else:
-            ads = Ad.objects.all().order_by('-timestamp').filter(is_share=isShare)
+            ads = ads.filter(is_share=isShare)
 
         totalItems = ads.count()
         totalPages = max(totalItems // itemsPerPage, 1)
@@ -117,7 +122,10 @@ class ApiV1:
         itemsPerPage = 10
 
         # TODO: pull only news that are not expired yet
+        today = datetime.date.today()
         allNews = News.objects.all().order_by('-expire_date')
+        allNews = allNews.filter(expire_date__gte=today)
+
         totalItems = allNews.count()
         totalPages = max(totalItems // itemsPerPage, 1)
         totalPages = totalItems // itemsPerPage
