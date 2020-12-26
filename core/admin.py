@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.admin.decorators import register
-from core.models import Ad, AdImage, AdVideo, Category, City, SponsorContent
+from core.models import Ad, AdImage, AdVideo, Category, City, News, NewsImage, NewsVideo, SponsorContent
 from django.contrib.auth.models import Group, User
 
 admin.site.unregister(Group)
@@ -19,11 +19,26 @@ class CategoryAdmin(admin.ModelAdmin):
     exclude = ['slug']
 
 
+class NewsRegionInline(admin.TabularInline):
+    model = News.regions.through
+    extra = 0
+    verbose_name = "Регион"
+    verbose_name_plural = "Регионы (В каких регионах показывать?)"
+
+
 class RegionInline(admin.TabularInline):
     model = Ad.regions.through
     extra = 0
     verbose_name = "Регион"
     verbose_name_plural = "Регионы (В каких регионах показывать?)"
+
+
+class NewsImageInline(admin.TabularInline):
+    model = NewsImage
+    extra = 0
+    readonly_fields = ('image_preview',)
+    verbose_name = "Картинки"
+    verbose_name_plural = "Картинки"
 
 
 class AdImageInline(admin.TabularInline):
@@ -34,12 +49,32 @@ class AdImageInline(admin.TabularInline):
     verbose_name_plural = "Картинки"
 
 
+class NewsVideoInline(admin.TabularInline):
+    model = NewsVideo
+    extra = 0
+    readonly_fields = ['thumbnailUrl', 'thumbnail_preview']
+    verbose_name = "Видео"
+    verbose_name_plural = "Видео (Вставить ссылку с YouTube!)"
+
+
 class AdVideoInline(admin.TabularInline):
     model = AdVideo
     extra = 0
     readonly_fields = ['thumbnailUrl', 'thumbnail_preview']
     verbose_name = "Видео"
     verbose_name_plural = "Видео (Вставить ссылку с YouTube!)"
+
+
+class NewsAdmin(admin.ModelAdmin):
+    list_display = ['description', 'expire_date']
+    exclude = ['regions']
+    verbose_name = "Новости"
+    verbose_name_plural = "Новости"
+    inlines = [
+        NewsRegionInline,
+        NewsImageInline,
+        NewsVideoInline,
+    ]
 
 
 class AdAdmin(admin.ModelAdmin):
@@ -74,5 +109,6 @@ class AdImageAdmin(admin.ModelAdmin):
 admin.site.register(City, CityAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Ad, AdAdmin)
+admin.site.register(News, NewsAdmin)
 admin.site.register(SponsorContent, SponsorAdmin)
 # admin.site.register(AdImage, AdImageAdmin)

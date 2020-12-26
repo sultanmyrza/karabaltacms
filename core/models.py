@@ -52,10 +52,23 @@ class Category(models.Model):
             return '(No image)'
 
 
+class News(models.Model):
+    description = models.TextField(max_length=300, verbose_name="Новость")
+    regions = models.ManyToManyField(City, verbose_name="Регион")
+    timestamp = models.DateTimeField(auto_now=True)
+    expire_date = models.DateField(default='', verbose_name="Активен до")
+
+    class Meta:
+        """Meta definition for Новость."""
+
+        verbose_name = 'Новость'
+        verbose_name_plural = 'Новости'
+
+
 class Ad(models.Model):
     """Model definition for Ad."""
     is_share = models.BooleanField(default=False, verbose_name="Акция")
-    description = models.TextField(max_length=300, verbose_name="Акция")
+    description = models.TextField(max_length=300, verbose_name="Описание")
     phone_number = models.CharField(
         max_length=50, verbose_name="Номер телефона")
     is_whatsapp_number = models.BooleanField(
@@ -79,6 +92,36 @@ class Ad(models.Model):
     def __str__(self):
         """Unicode representation of Ad."""
         return self.description
+
+
+class NewsVideo(models.Model):
+    """Model definition for NewsVideo."""
+    news = models.ForeignKey(News, on_delete=models.CASCADE)
+    position = models.IntegerField(default=0)
+    videoUrl = models.CharField(max_length=1500, default="")
+    thumbnailUrl = models.CharField(
+        max_length=1500, default="", null=True, blank=True)
+
+    class Meta:
+        """Meta definition for AdVideo."""
+
+        verbose_name = 'AdVideo'
+        verbose_name_plural = 'AdVideos'
+
+    def save(self, *args, **kwargs):
+        url = "https://img.youtube.com/vi/{0}/hqdefault.jpg"
+        self.thumbnailUrl = url.format(self.videoUrl.split('/')[-1])
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        """Unicode representation of AdVideo."""
+        return self.ad.description
+
+    def thumbnail_preview(self):
+        if self.thumbnailUrl:
+            return mark_safe('<img src="{0}" width="150" height="150" />'.format(self.thumbnailUrl))
+        else:
+            return '(No thumbnail)'
 
 
 class AdVideo(models.Model):
@@ -109,6 +152,29 @@ class AdVideo(models.Model):
             return mark_safe('<img src="{0}" width="150" height="150" />'.format(self.thumbnailUrl))
         else:
             return '(No thumbnail)'
+
+
+class NewsImage(models.Model):
+    """Model definition for News Image."""
+    news = models.ForeignKey(News, on_delete=models.CASCADE)
+    position = models.IntegerField(default=0)
+    image = models.ImageField(upload_to='images')
+
+    class Meta:
+        """Meta definition for AdImage."""
+
+        verbose_name = 'AdImage'
+        verbose_name_plural = 'AdImages'
+
+    def __str__(self):
+        """Unicode representation of AdImage."""
+        return self.news.description
+
+    def image_preview(self):
+        if self.image:
+            return mark_safe('<img src="{0}" width="150" height="150" />'.format(self.image.url))
+        else:
+            return '(No image)'
 
 
 class AdImage(models.Model):

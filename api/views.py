@@ -1,6 +1,6 @@
 from django.core.paginator import Paginator
 from django.db.models.fields.files import FileField
-from core.models import AdImage, AdVideo, Category, City, Ad
+from core.models import AdImage, AdVideo, Category, City, Ad, News, NewsImage, NewsVideo
 from django.shortcuts import render
 from django.http import JsonResponse
 import json
@@ -104,6 +104,63 @@ class ApiV1:
             "result": "success",
             "adsCity": adsCity,
             "adsCategory": adsCategory,
+            "pageNumber": pageNumber,
+            "minPage": 1,
+            "maxPage": totalPages,
+            "totalItems": totalItems,
+            "data": adsData,
+        }
+        return JsonResponse(data, safe=True)
+
+    def getNews(request):
+        pageNumber = int(request.GET.get('page', 0))
+        itemsPerPage = 10
+
+        # TODO: pull only news that are not expired yet
+        allNews = News.objects.all().order_by('-expire_date')
+        totalItems = allNews.count()
+        totalPages = max(totalItems // itemsPerPage, 1)
+        totalPages = totalItems // itemsPerPage
+
+        startIndex = pageNumber * itemsPerPage
+        endIndex = min(startIndex + itemsPerPage, totalItems)
+
+        allNews = allNews[startIndex:endIndex]
+
+        adsData = []
+
+        for news in allNews:
+            adImages = NewsImage.objects.filter(
+                news__id=news.id
+            )
+            adImagesData = []
+            for adImage in adImages:
+                adImagesData.append({
+                    "type": "image",
+                    "position": adImage.position,
+                    "imageUrl": adImage.image.url,
+                })
+
+            adVideos = NewsVideo.objects.filter(
+                news__id=news.id
+            )
+            adVideosData = []
+            for adVideo in adVideos:
+                adVideosData.append({
+                    "type": "video",
+                    "position": adVideo.position,
+                    "videoUrl": adVideo.videoUrl,
+                    "thumbnailUrl": adVideo.thumbnailUrl
+                })
+
+            adsData.append({
+                'description': news.description,
+                'expireDate': news.expire_date,
+                'content': [*adImagesData, *adVideosData]
+            })
+
+        data = {
+            "result": "success",
             "pageNumber": pageNumber,
             "minPage": 1,
             "maxPage": totalPages,

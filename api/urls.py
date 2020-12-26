@@ -7,6 +7,7 @@ from django.urls import path
 urlpatterns = [
     path('v1/getCities', ApiV1.getCities, name='getCitiesV1'),
     path('v1/getCategories', ApiV1.getCategories, name="getCategoriesV1"),
+    path('v1/getNews', ApiV1.getNews, name="getNewsV1"),
     path('v1/getSponsoredAds', ApiV1.getSponsoredAds, name="getSponsoredAdsV1"),
     path('v1/prepopulateFromJson', ApiV1.prepopulateFromJson,
          name="prepopulateFromJsonV1"),
