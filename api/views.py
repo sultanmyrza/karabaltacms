@@ -245,7 +245,7 @@ class ApiV1:
             sponsoredContentBannerImage = AdImage.objects.filter(
                 ad__id=sponsoredContent.id).first()
             data['data'].append({
-                'description': sponsoredContent.description,
+                # 'description': sponsoredContent.description,
                 'sponsorName': sponsoredContent.sponsor_name,
                 'redirectUrl': sponsoredContent.redirect_url,
                 'bannerImage': sponsoredContentBannerImage.image.url,
